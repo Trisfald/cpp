@@ -21,9 +21,9 @@ class Simulated_annealing
 public:
 	typedef State State_type;
 	Simulated_annealing(const Generator& generator = Generator(),
-		const Energy& energy = Energy(),
-		const Schedule& schedule = Schedule()) :
-			generator_(generator), energy_(energy), schedule_(schedule) 
+			const Energy& energy = Energy(),
+			const Schedule& schedule = Schedule())
+	: generator_(generator), energy_(energy), schedule_(schedule)
 	{}
     State operator()(State start);
 private:

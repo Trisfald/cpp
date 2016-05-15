@@ -11,6 +11,7 @@
 
 namespace detail
 {
+
 	template <typename S, typename N>
 	inline std::pair<S, N> get_threads_and_block_size(S size, N num_threads_hint, N min_items_per_thread)
 	{
@@ -21,9 +22,9 @@ namespace detail
 	}
 
 	template <typename It,
-		typename Func,
-		typename... Args,
-		typename std::enable_if_t<!std::is_void<std::result_of_t<Func(It, It, Args...)>>::value>* = nullptr>
+			typename Func,
+			typename... Args,
+			typename std::enable_if_t<!std::is_void<std::result_of_t<Func(It, It, Args...)>>::value>* = nullptr>
 	auto block_parallelizer(unsigned num_threads_hint,
 			unsigned min_items_per_thread,
 			It begin,
@@ -67,9 +68,9 @@ namespace detail
 	}
 
 	template <typename It,
-		typename Func,
-		typename... Args,
-		typename std::enable_if_t<std::is_void<std::result_of_t<Func(It, It, Args...)>>::value>* = nullptr>
+			typename Func,
+			typename... Args,
+			typename std::enable_if_t<std::is_void<std::result_of_t<Func(It, It, Args...)>>::value>* = nullptr>
 	auto block_parallelizer(unsigned num_threads_hint,
 			unsigned min_items_per_thread,
 			It begin,
@@ -110,6 +111,7 @@ namespace detail
 			futures[i].get();
 		}
 	}
+
 }
 
 template <typename It, typename T>
@@ -120,11 +122,11 @@ typename std::iterator_traits<It>::difference_type parallel_count(It begin,
 		unsigned min_items_per_thread = 100)
 {
 	return detail::block_parallelizer(num_threads_hint, 
-		min_items_per_thread, 
-		begin, 
-		end, 
-		[] (auto&&... args) -> decltype(auto) { return std::count(std::forward<decltype(args)>(args)...); }, 
-		value);
+			min_items_per_thread,
+			begin,
+			end,
+			[] (auto&&... args) -> decltype(auto) { return std::count(std::forward<decltype(args)>(args)...); },
+			value);
 }
 
 template <typename It, typename Predicate>
@@ -135,11 +137,11 @@ typename std::iterator_traits<It>::difference_type parallel_count_if(It begin,
 		unsigned min_items_per_thread = 100)
 {
 	return detail::block_parallelizer(num_threads_hint, 
-		min_items_per_thread, 
-		begin, 
-		end, 
-		[] (auto&&... args) -> decltype(auto) { return std::count_if(std::forward<decltype(args)>(args)...); }, 
-		predicate);
+			min_items_per_thread,
+			begin,
+			end,
+			[] (auto&&... args) -> decltype(auto) { return std::count_if(std::forward<decltype(args)>(args)...); },
+			predicate);
 }
 
 template <typename It, typename T>
@@ -151,12 +153,12 @@ void parallel_replace(It begin,
 		unsigned min_items_per_thread = 100)
 {
 	return detail::block_parallelizer(num_threads_hint, 
-		min_items_per_thread, 
-		begin, 
-		end, 
-		[] (auto&&... args) -> decltype(auto) { return std::replace(std::forward<decltype(args)>(args)...); },
-		old_value, 
-		new_value);
+			min_items_per_thread,
+			begin,
+			end,
+			[] (auto&&... args) -> decltype(auto) { return std::replace(std::forward<decltype(args)>(args)...); },
+			old_value,
+			new_value);
 }
 
 #endif

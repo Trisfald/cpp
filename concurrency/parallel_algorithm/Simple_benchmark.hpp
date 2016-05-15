@@ -6,8 +6,8 @@
 #include <chrono>
 
 template <typename Func,
-	typename... Args,
-	typename std::enable_if_t<!std::is_void<std::result_of_t<Func(Args...)>>::value>* = nullptr>
+		typename... Args,
+		typename std::enable_if_t<!std::is_void<std::result_of_t<Func(Args...)>>::value>* = nullptr>
 decltype(auto) benchmark(Func f, Args&&... args)
 {
 	auto start = std::chrono::steady_clock::now();
@@ -18,8 +18,8 @@ decltype(auto) benchmark(Func f, Args&&... args)
 }
 
 template <typename Func,
-	typename... Args,
-	typename std::enable_if_t<std::is_void<std::result_of_t<Func(Args...)>>::value>* = nullptr>
+		typename... Args,
+		typename std::enable_if_t<std::is_void<std::result_of_t<Func(Args...)>>::value>* = nullptr>
 void benchmark(Func f, Args&&... args)
 {
 	auto start = std::chrono::steady_clock::now();
