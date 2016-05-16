@@ -15,4 +15,5 @@ If it reaches a local maximum, a naive algorithm gets stuck because it can't see
 In a genetic algorithm a population of 'individuals' (in this case these are problem states) is repeatedly combined with each other. The best specimen are more likely to reproduce thus improving the chances of finding a solution. The algorithm may also make random mutations to the individuals. 
 
 I wrote a basic implementation of a generic genetic algoritm (GA) and another one that makes use of parallelism to improve performance (PGA). 
-**N_queens_ga.pp** uses both versions of the algorithm to solve the queens puzzle.
+
+**N_queens_ga.cpp** uses both versions of the algorithm to solve the queens puzzle.
