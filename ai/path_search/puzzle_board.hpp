@@ -106,22 +106,19 @@ struct Puzzle_successors_gen
 	typedef std::tuple<Puzzle_board<N>, Puzzle_action, float> Successor;
 	typedef void (*Insert_fn)(std::vector<Successor>& v,
 			typename Puzzle_board<N>::Data&& data,
-			Puzzle_action::Type action,
-			unsigned& i);
+			Puzzle_action::Type action);
 	auto operator()(const Puzzle_board<N>& parent) const
 	{
 		std::vector<Successor> v;
 		Pos zero = find_zero(parent);
-		unsigned i = 0;
 		static auto fn = [](std::vector<Successor>& v,
 				typename Puzzle_board<N>::Data&& data,
-				Puzzle_action::Type action,
-				unsigned& i)
+				Puzzle_action::Type action)
 				{ v.emplace_back(std::forward_as_tuple(std::move(data), Puzzle_action(action), 1.0f)); };
-		check_and_add(v, parent, zero, {zero.first+1, zero.second}, fn, i, Puzzle_action::DOWN);
-		check_and_add(v, parent, zero, {zero.first-1, zero.second}, fn, i, Puzzle_action::UP);
-		check_and_add(v, parent, zero, {zero.first, zero.second+1}, fn, i, Puzzle_action::RIGHT);
-		check_and_add(v, parent, zero, {zero.first, zero.second-1}, fn, i, Puzzle_action::LEFT);
+		check_and_add(v, parent, zero, {zero.first+1, zero.second}, fn, Puzzle_action::DOWN);
+		check_and_add(v, parent, zero, {zero.first-1, zero.second}, fn, Puzzle_action::UP);
+		check_and_add(v, parent, zero, {zero.first, zero.second+1}, fn, Puzzle_action::RIGHT);
+		check_and_add(v, parent, zero, {zero.first, zero.second-1}, fn, Puzzle_action::LEFT);
 		return v;
 	}
 private:
@@ -130,7 +127,6 @@ private:
 			const Pos& zero,
 			const Pos& pos,
 			Insert_fn insert_fn,
-			unsigned& i,
 			Puzzle_action::Type action) const noexcept
 	{
 		if (pos.first < 0 || pos.first >= N || pos.second < 0 || pos.second >= N)
@@ -139,7 +135,7 @@ private:
 		}
 		typename Puzzle_board<N>::Data data = parent.data();
 		std::swap(data[zero.first][zero.second], data[pos.first][pos.second]);
-		insert_fn(v, std::move(data), action, i);
+		insert_fn(v, std::move(data), action);
 	}
 	Pos find_zero(const Puzzle_board<N>& parent) const noexcept
 	{
@@ -191,7 +187,7 @@ struct Puzzle_heuristic_manhattan
 			}
 		}
 	}
-	float operator()(const Puzzle_board<N>& state, const Puzzle_board<N>& goal) const noexcept
+	float operator()(const Puzzle_board<N>& state, const Puzzle_board<N>&) const noexcept
 	{
 		float n = 0;
 		for (signed char i = 0; i < N; ++i)
