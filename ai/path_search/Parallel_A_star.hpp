@@ -23,7 +23,7 @@ template <typename State,
 		typename Generator,
 		typename Heuristic,
 		template <typename, typename> class Result_policy = Full_result>
-class BA_star_search : public A_star_search<State, Action, Generator, Heuristic, Result_policy>
+class BA_star_search : private A_star_search<State, Action, Generator, Heuristic, Result_policy>
 {
 	typedef A_star_search<State, Action, Generator, Heuristic, Result_policy> Base;
 	struct Frontier_data;

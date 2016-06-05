@@ -405,7 +405,7 @@ template <typename State,
 		typename Generator,
 		typename Heuristic,
 		template <typename, typename> class Result_policy = Full_result>
-class IDA_star_search : public A_star_search<State, Action, Generator, Heuristic, Result_policy>
+class IDA_star_search : protected A_star_search<State, Action, Generator, Heuristic, Result_policy>
 {
 	typedef A_star_search<State, Action, Generator, Heuristic, Result_policy> Base;
 public:
@@ -513,7 +513,7 @@ template <typename State,
 		typename Generator,
 		typename Heuristic,
 		template <typename, typename> class Result_policy = Full_result>
-class IEA_star_search : public IDA_star_search<State, Action, Generator, Heuristic, Result_policy>
+class IEA_star_search : private IDA_star_search<State, Action, Generator, Heuristic, Result_policy>
 {
 	typedef IDA_star_search<State, Action, Generator, Heuristic, Result_policy> Base;
 public:
