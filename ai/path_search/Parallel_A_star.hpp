@@ -32,7 +32,10 @@ public:
 	using typename Base::Result_type;
 	using typename Base::Result;
 	using Base::Base;
-	Result_type operator()(State start, State goal, float max_cost = std::numeric_limits<float>::max()) const;
+	Result_type operator()(State start,
+			State goal,
+			bool improved_accuracy = true,
+			float max_cost = std::numeric_limits<float>::max()) const;
 private:
 	typedef A_star_node<State, Action> Node;
 	typedef A_star_node_ptr<State, Action> Node_ptr;
@@ -53,6 +56,7 @@ private:
 			float max_cost,
 			Frontier_data,
 			detail::Lock_data) const;
+	void find_best_connect(Node*&, Node*&, const Frontier_set&, const Frontier_set&) const;
 };
 
 template <typename State,
@@ -115,6 +119,7 @@ template <typename State,
 typename BA_star_search<State, Action, Generator, Heuristic, Result_policy>::Result_type
 BA_star_search<State, Action, Generator, Heuristic, Result_policy>::operator()(State start,
 		State goal,
+		bool improved_accuracy,
 		float max_cost) const
 {
 	Frontier frontier_1, frontier_2;
@@ -154,6 +159,10 @@ BA_star_search<State, Action, Generator, Heuristic, Result_policy>::operator()(S
 	{
 		auto connect_fw = std::get<0>(result_fw).get();
 		auto connect_bw = std::get<1>(result_fw);
+		if (improved_accuracy)
+		{
+			find_best_connect(connect_fw, connect_bw, frontier_set_1, frontier_set_2);
+		}
 		return std::make_pair(std::move(Result_policy<State, Action>::make_path(connect_fw, connect_bw)),
 				Result::success);
 	}
@@ -161,6 +170,10 @@ BA_star_search<State, Action, Generator, Heuristic, Result_policy>::operator()(S
 	{
 		auto connect_bw = std::get<0>(result_bw).get();
 		auto connect_fw = std::get<1>(result_bw);
+		if (improved_accuracy)
+		{
+			find_best_connect(connect_fw, connect_bw, frontier_set_1, frontier_set_2);
+		}
 		return std::make_pair(std::move(Result_policy<State, Action>::make_path(connect_fw, connect_bw)),
 				Result::success);
 	}	
@@ -245,6 +258,36 @@ BA_star_search<State, Action, Generator, Heuristic, Result_policy>::search(const
 	return cutoff_occurred ?
 			std::make_tuple(nullptr, nullptr, Partial_result::iteration_cutoff) :
 			std::make_tuple(nullptr, nullptr, Partial_result::failure);
+}
+
+template <typename State,
+		typename Action,
+		typename Generator,
+		typename Heuristic,
+		template <typename, typename> class Result_policy>
+void BA_star_search<State, Action, Generator, Heuristic, Result_policy>::find_best_connect(Node*& connect_fw,
+		Node*& connect_bw,
+		const Frontier_set& frontier_set_1,
+		const Frontier_set& frontier_set_2) const
+{
+	float cost = connect_fw->g_cost + connect_bw->g_cost;
+	const bool first_set_smaller = frontier_set_1.size() <= frontier_set_2.size();
+	const auto& frontier_src = first_set_smaller ? frontier_set_1 : frontier_set_2;
+	const auto& frontier_dst = first_set_smaller ? frontier_set_2 : frontier_set_1;
+	for (const auto ptr_1 : frontier_src)
+	{
+		const auto it = frontier_dst.find(ptr_1);
+		if (it != frontier_dst.cend())
+		{
+			float new_cost = ptr_1->g_cost + (*it)->g_cost;
+			if (new_cost < cost)
+			{
+				cost = new_cost;
+				connect_fw = first_set_smaller ? ptr_1 : *it;
+				connect_bw = first_set_smaller ? *it : ptr_1;
+			}
+		}
+	}
 }
 
 #endif
