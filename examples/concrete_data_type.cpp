@@ -20,7 +20,7 @@ class No_dynamic
 {
 private:
     static void* operator new(std::size_t); // disallow new
-    static void* operator new(std::size_t, void*);  // disallow placement new
+    static void* operator new[](std::size_t);  // disallow mew []
 };
 
 
