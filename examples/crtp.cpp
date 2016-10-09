@@ -10,7 +10,7 @@ class Base
 public:
 	void method()
 	{
-		impl().method();
+		impl().do_method();
 	}
 private:
 	T& impl()
@@ -19,26 +19,28 @@ private:
 	}
 };
 
-struct Derived_a : Base<Derived_a>
+class Derived_a : public Base<Derived_a>
 {
-	void method()
+	friend Base;
+	void do_method()
 	{
 		std::cout << "derived A method called" << std::endl;
 	}
 };
 
-struct Derived_b : Base<Derived_b>
+class Derived_b : public Base<Derived_b>
 {
-	void method()
+	friend Base;
+	void do_method()
 	{
 		std::cout << "derived B method called" << std::endl;
 	}
 };
 
 template <typename T>
-void invoke(Base<T>* t)
+void invoke(Base<T>& t)
 {
-	t->method();
+	t.method();
 }
 
 
@@ -81,8 +83,8 @@ int main()
 	// Compile time polymorphism
 	Derived_a a;
 	Derived_b b;
-	invoke(&a);
-	invoke(&b);
+	invoke(a);
+	invoke(b);
 
 
 	// Mixin that adds comparison operators
